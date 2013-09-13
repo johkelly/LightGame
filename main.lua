@@ -5,6 +5,10 @@ Kuroko = {
 	h = 100,
 	collide = function(self, cx, cy)
 		return (cx - self.x < self.w) and (cy - self.y < self.h)
+	end,
+
+	draw = function(self)
+		love.graphics.draw(kuroko, self.x, self.y)
 	end
 };
 
@@ -17,6 +21,26 @@ function love.load()
 end
 
 function love.draw()
-   love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
-   print( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
+   --love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
+   Kuroko:draw()
+	 if( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
+	 then
+		-- Kuroko:draw()
+	 end
+
+end
+
+function love.mousepressed(x, y, button)
+  if( Kuroko:collide(x, y))
+	then
+		 Kuroko.grabbed = true
+		 Kuroko.grabX = x
+		 Kuroko.grabY = y
+	end
+end
+
+function love.mousereleased(x, y, button)
+	Kuroko.x = Kuroko.x + x - Kuroko.grabX
+	Kuroko.y = Kuroko.y + y - Kuroko.grabY
+	Kuroko.grabbed = false
 end
