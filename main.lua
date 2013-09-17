@@ -5,9 +5,9 @@ Kuroko = {
 	h = 100,
 
 	dragging = {
-	 grabbed = false,
-	 grabX = 0,
-	 grabY = 0
+		grabbed = false,
+		grabX = 0,
+		grabY = 0
 	},
 
 	collide = function(self, cx, cy)
@@ -20,30 +20,34 @@ Kuroko = {
 };
 
 function love.load()
-   kuroko = love.graphics.newImage("images/kuroko.png")
-   x = 100
-   y = 100
-   Kuroko.w = kuroko:getWidth()
-   Kuroko.h = kuroko:getHeight()
+	dofile("gridspace.lua")
+	foo = GridContainer(10, 10, 500, 500, 3, 3)
+	foo:putObject(Kuroko, 0, 1)
+	kuroko = love.graphics.newImage("images/kuroko.png")
+	x = 100
+	y = 100
+	Kuroko.w = kuroko:getWidth()
+	Kuroko.h = kuroko:getHeight()
 end
 
 function love.draw()
-   --love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
-   Kuroko:draw()
---[[
-	 if( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
-	 then
-		-- Kuroko:draw()
-	 end
-]]
+	--love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
+	-- Kuroko:draw()
+	foo:draw()
+	--[[
+	if( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
+	then
+	-- Kuroko:draw()
+	end
+	]]
 end
 
 function love.mousepressed(x, y, button)
-  if( Kuroko:collide(x, y))
+	if( Kuroko:collide(x, y))
 	then
-		 Kuroko.dragging.grabbed = true
-		 Kuroko.dragging.grabX = x - Kuroko.x
-		 Kuroko.dragging.grabY = y - Kuroko.y
+		Kuroko.dragging.grabbed = true
+		Kuroko.dragging.grabX = x - Kuroko.x
+		Kuroko.dragging.grabY = y - Kuroko.y
 	end
 end
 
