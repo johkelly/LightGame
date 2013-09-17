@@ -58,3 +58,9 @@ end
 function love.mousereleased(x, y, button)
 	Kuroko.dragging.grabbed= false
 end
+
+function love.keypressed(key, isrepeat)
+	if key == "escape" then
+		love.event.push("quit")
+	end
+end
