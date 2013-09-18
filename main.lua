@@ -15,13 +15,14 @@ Kuroko = {
 	end,
 
 	draw = function(self)
+		love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 		love.graphics.draw(kuroko, self.x, self.y)
 	end
 };
 
 function love.load()
-	dofile("gridspace.lua")
-	foo = GridContainer(10, 10, 500, 500, 3, 3)
+	GridModule = require("gridspace_module")
+	foo = GridModule.GridContainer(10, 10, 500, 500, 3, 3)
 	foo:putObject(Kuroko, 0, 1)
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	x = 100
