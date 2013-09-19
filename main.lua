@@ -17,24 +17,34 @@ Kuroko = {
 	draw = function(self)
 		love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
 		love.graphics.draw(kuroko, self.x, self.y)
-	end
+	end,
+	
+	-- TESTING, DELETE ME ASAP
+	new = function()
+		local t = {}
+		setmetatable(t, Kuroko)
+		return t
+	end,
 };
 
 function love.load()
 	GridModule = require("gridspace_module")
 	foo = GridModule.GridContainer(10, 10, 500, 500, 3, 3)
-	foo:putObject(Kuroko, 0, 1)
+	--foo:putObject(Kuroko, 0, 1)
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	x = 100
 	y = 100
 	Kuroko.w = kuroko:getWidth()
 	Kuroko.h = kuroko:getHeight()
+	GO_Kuroko = GridModule.GridObject(kuroko)
+	foo:putObject(GO_Kuroko, 0, 1)
 end
 
 function love.draw()
 	--love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
 	-- Kuroko:draw()
 	foo:draw()
+	--GO_Kuroko:drawFill(10, 10, 100, 100)
 	--[[
 	if( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
 	then

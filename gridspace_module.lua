@@ -1,6 +1,10 @@
 local GridSpace = {}
 
-GridSpace.GridContainer = {
+--[[
+Define a GridContainer to act as the primary layout manager.
+]]--
+
+local GridContainer = {
 	putObject = function(self, obj, x, y)
 	-- store obj at (x,y)
 		self.obj[x][y] = obj
@@ -32,7 +36,10 @@ GridSpace.GridContainer = {
 				local objs = self.obj[x][y]
 				if(objs)
 				then
-					objs:draw()
+					-- TODO: for each in objs
+					local l, t = self.x + x * cWidth, self.y + y * cHeight
+					local r, b = l + cWidth, t + cHeight
+					objs:drawFill(self.x + x * cWidth, self.y + y * cHeight, r, b)
 				end
 			end
 		end
@@ -40,9 +47,10 @@ GridSpace.GridContainer = {
 	end,
 }
 
-local GridContainer_mt = {__index = GridSpace.GridContainer}
+local GridContainer_mt = {__index = GridContainer}
 
-GridSpace.GridContainer.ctor = function(self, l, t, w, h, r, c)
+-- Need the metatable to be defined before this point
+GridContainer.ctor = function(self, l, t, w, h, r, c)
 	local t = {x = l, y = t, width = w, height = h, rows = r, cols = c }
 	t.obj = {}
 	for lx = 0, r, 1 do
@@ -52,8 +60,47 @@ GridSpace.GridContainer.ctor = function(self, l, t, w, h, r, c)
 	return t
 end
 
-local GridContainer_cmt = {__call = GridSpace.GridContainer.ctor}
+local GridContainer_cmt = {__call = GridContainer.ctor}
 
-setmetatable(GridSpace.GridContainer, GridContainer_cmt)
+setmetatable(GridContainer, GridContainer_cmt)
+
+GridSpace.GridContainer = GridContainer
+
+--[[
+Define a GridObject to act as a container for drawable content.
+]]--
+
+local GridObject = {}
+
+function GridObject.draw(self)
+	love.graphics.draw(self.image, self.x, self.y)
+end
+
+function GridObject.drawFill(self, l, t, r, b)
+	local image = self.image
+	local w = image:getWidth()
+	local h = image:getHeight()
+	local xScale = (r-l)/w
+	local yScale = (b-t)/h
+	local scale = math.min(xScale, yScale)
+	local drawX = l + math.floor(( (r-l) - w * scale ) / 2)
+	local drawY = t + math.floor(( (b-t) - h * scale ) / 2)
+	love.graphics.draw(image, drawX, drawY, 0, scale)
+end
+
+local GridObject_mt = {__index = GridObject}
+
+function GridObject.ctor(self, image, x, y)
+	local t = {x = x or 0, y = y or 0}
+	t.image = image
+	setmetatable(t, GridObject_mt)
+	return t
+end
+
+local GridObject_cmt = {__call = GridObject.ctor}
+
+setmetatable(GridObject, GridObject_cmt)
+
+GridSpace.GridObject = GridObject
 
 return GridSpace
