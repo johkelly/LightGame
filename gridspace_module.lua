@@ -1,11 +1,6 @@
-GridContainer = {
-	x = 0,
-	y = 0,
-	width = -1,
-	height = -1,
-	rows = 0,
-	cols = 0,
+local GridSpace = {}
 
+GridSpace.GridContainer = {
 	putObject = function(self, obj, x, y)
 	-- store obj at (x,y)
 		self.obj[x][y] = obj
@@ -45,9 +40,9 @@ GridContainer = {
 	end,
 }
 
-GridContainer_mt = {__index = GridContainer}
+local GridContainer_mt = {__index = GridSpace.GridContainer}
 
-GridContainer.ctor = function(self, l, t, w, h, r, c)
+GridSpace.GridContainer.ctor = function(self, l, t, w, h, r, c)
 	local t = {x = l, y = t, width = w, height = h, rows = r, cols = c }
 	t.obj = {}
 	for lx = 0, r, 1 do
@@ -57,4 +52,8 @@ GridContainer.ctor = function(self, l, t, w, h, r, c)
 	return t
 end
 
-setmetatable(GridContainer, {__call = GridContainer.ctor})
+local GridContainer_cmt = {__call = GridSpace.GridContainer.ctor}
+
+setmetatable(GridSpace.GridContainer, GridContainer_cmt)
+
+return GridSpace
