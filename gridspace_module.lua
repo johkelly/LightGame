@@ -15,6 +15,17 @@ GridSpace.GridContainer = {
 	removeObject = function(self, obj, x, y)
 	-- remove obj from (x,y)
 	end,
+	
+	snapObject = function(self, obj)
+		local near_x = obj.x / (self.width / self.rows)
+		local near_y = obj.y / (self.height / self.cols)
+		near_x = math.floor(near_x + .5)
+		near_y = math.floor(near_y + .5)
+		print (near_x)
+		print (near_y)
+		obj.x = self.x + (self.width / self.rows) * near_x
+		obj.y = self.y + (self.width / self.rows) * near_y
+	end,
 
 	draw = function(self)
 		love.graphics.line(self.x, self.y, self.x+self.width, self.y)

@@ -62,6 +62,7 @@ end
 
 function love.mousereleased(x, y, button)
 	Kuroko.dragging.grabbed= false
+	foo:snapObject(Kuroko)
 end
 
 function love.keypressed(key, isrepeat)
