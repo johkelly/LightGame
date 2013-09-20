@@ -1,44 +1,9 @@
-Kuroko = {
-	x = 0,
-	y = 0,
-	w = 100,
-	h = 100,
-
-	dragging = {
-		grabbed = false,
-		grabX = 0,
-		grabY = 0
-	},
-
-	collide = function(self, cx, cy)
-		return (cx - self.x < self.w) and (cy - self.y < self.h)
-	end,
-
-	draw = function(self)
-		love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
-		love.graphics.draw(kuroko, self.x, self.y)
-	end,
-	
-	-- TESTING, DELETE ME ASAP
-	new = function()
-		local t = {}
-		setmetatable(t, Kuroko)
-		return t
-	end,
-};
-
 function love.load()
+	love.graphics.setMode(600, 500)
 	GridModule = require("gridspace_module")
-	foo = GridModule.GridContainer(10, 10, 500, 500, 3, 3)
-	--foo:putObject(Kuroko, 0, 1)
-	foo:putObject(Kuroko, 1, 0)
-	foo:getObjects(1, 0)
-	foo:removeObject(Kuroko, 1, 0)
+	MouseGrabStack = require("mousegrab_module")
+	foo = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
 	kuroko = love.graphics.newImage("images/kuroko.png")
-	x = 100
-	y = 100
-	Kuroko.w = kuroko:getWidth()
-	Kuroko.h = kuroko:getHeight()
 	GO_Kuroko = GridModule.GridObject(kuroko)
 	foo:putObject(GO_Kuroko, 0, 1)
 end
@@ -47,6 +12,7 @@ function love.draw()
 	--love.graphics.draw(kuroko, Kuroko.x, Kuroko.y)
 	-- Kuroko:draw()
 	foo:draw()
+	MouseGrabStack.draw()
 	--GO_Kuroko:drawFill(10, 10, 100, 100)
 	--[[
 	if( Kuroko:collide(love.mouse.getX(), love.mouse.getY()) )
@@ -57,25 +23,32 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
-	if( Kuroko:collide(x, y))
-	then
-		Kuroko.dragging.grabbed = true
-		Kuroko.dragging.grabX = x - Kuroko.x
-		Kuroko.dragging.grabY = y - Kuroko.y
-	end
+	grabbed = foo:pickObject(x, y)
+	foo:removeObject(x, y)
+	MouseGrabStack.grab(grabbed, x, y)
+	--	if( Kuroko:collide(x, y))
+	--	then
+	--		Kuroko.dragging.grabbed = true
+	--		Kuroko.dragging.grabX = x - Kuroko.x
+	--		Kuroko.dragging.grabY = y - Kuroko.y
+	--	end
 end
 
 function love.update(dt)
-	if(Kuroko.dragging.grabbed)
-	then
-		Kuroko.x = love.mouse.getX() - Kuroko.dragging.grabX
-		Kuroko.y = love.mouse.getY() - Kuroko.dragging.grabY
-	end
+--	if(Kuroko.dragging.grabbed)
+--	then
+--		Kuroko.x = love.mouse.getX() - Kuroko.dragging.grabX
+--		Kuroko.y = love.mouse.getY() - Kuroko.dragging.grabY
+--	end
 end
 
 function love.mousereleased(x, y, button)
-	Kuroko.dragging.grabbed= false
-	foo:snapObject(Kuroko)
+	local released, grabX, grabY = MouseGrabStack.release()
+	if released then
+		foo:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+	end
+	--	Kuroko.dragging.grabbed= false
+	--	foo:snapObject(Kuroko)
 end
 
 function love.keypressed(key, isrepeat)

@@ -11,15 +11,23 @@ local GridContainer = {
 		obj.y = self.y + (self.height / self.cols) * y
 		self.obj[x][y] = obj
 	end,
+	
+	pickObject = function(self, x, y)
+		local gridx = math.floor(self.rows*(x-self.x)/self.width)
+		local gridy = math.floor(self.cols*(y-self.y)/self.height)
+		return self.obj[gridx][gridy]
+	end,
 
 	getObjects = function(self, x, y)
 	-- return a collection of objects at (x,y)
 		return self.obj[x][y]
 	end,
 
-	removeObject = function(self, obj, x, y)
+	removeObject = function(self, x, y)
 	-- remove obj from (x,y)
-		self.obj[x][y] = nil
+		local gridx = math.floor(self.rows*(x-self.x)/self.width)
+		local gridy = math.floor(self.cols*(y-self.y)/self.height)
+		self.obj[gridx][gridy] = nil
 	end,
 	
 	snapObject = function(self, obj)
@@ -29,6 +37,17 @@ local GridContainer = {
 		near_y = math.min(math.max(math.floor(near_y + .5),0),self.cols - 1)
 		obj.x = self.x + (self.width / self.rows) * near_x
 		obj.y = self.y + (self.width / self.rows) * near_y
+		self:putObject(obj, near_x, near_y)
+	end,
+	
+	snapObjectAt = function(self, obj, x, y)
+		local near_x = (x - self.x) / (self.width / self.rows)
+		local near_y = (y - self.y) / (self.height / self.cols)
+		near_x = math.min(math.max(math.floor(near_x),0),self.rows - 1)
+		near_y = math.min(math.max(math.floor(near_y),0),self.cols - 1)
+		obj.x = self.x + (self.width / self.rows) * near_x
+		obj.y = self.y + (self.width / self.rows) * near_y
+		self:putObject(obj, near_x, near_y)
 	end,
 
 	draw = function(self)
@@ -48,13 +67,13 @@ local GridContainer = {
 
 		for x = 0, self.rows, 1 do
 			for y = 0, self.cols, 1 do
-				local objs = self.obj[x][y]
-				if(objs)
+				local obj = self.obj[x][y]
+				if(obj)
 				then
 					-- TODO: for each in objs
 					local l, t = self.x + x * cWidth, self.y + y * cHeight
 					local r, b = l + cWidth, t + cHeight
-					objs:drawFill(self.x + x * cWidth, self.y + y * cHeight, r, b)
+					obj:drawFill(l, t, r, b)
 				end
 			end
 		end
@@ -88,7 +107,11 @@ Define a GridObject to act as a container for drawable content.
 local GridObject = {}
 
 function GridObject.draw(self)
-	love.graphics.draw(self.image, self.x, self.y)
+	love.graphics.draw(self.image, self.x, self.y, 0, self.s)
+end
+
+function GridObject.drawOffset(self, dx, dy)
+	love.graphics.draw(self.image, self.x+dx, self.y+dy, 0, self.s)
 end
 
 function GridObject.drawFill(self, l, t, r, b)
@@ -101,6 +124,11 @@ function GridObject.drawFill(self, l, t, r, b)
 	local drawX = l + math.floor(( (r-l) - w * scale ) / 2)
 	local drawY = t + math.floor(( (b-t) - h * scale ) / 2)
 	love.graphics.draw(image, drawX, drawY, 0, scale)
+	self.s = scale
+	self.x = drawX
+	self.y = drawY
+	self.w = w * scale
+	self.h = h * scale
 end
 
 local GridObject_mt = {__index = GridObject}
