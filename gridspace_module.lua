@@ -12,13 +12,13 @@ local GridContainer = {
 		self.obj[x][y] = obj
 	end,
 
-	getObjects = function(self, x, y)
-	-- return a collection of objects at (x,y)
+	getObject = function(self, x, y)
+	-- return object at (x,y)
 		return self.obj[x][y]
 	end,
 
 	removeObject = function(self, obj, x, y)
-	-- remove obj from (x,y)
+	-- remove object from (x,y)
 		self.obj[x][y] = nil
 	end,
 	
