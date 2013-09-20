@@ -15,8 +15,7 @@ GridSpace.GridContainer = {
 
 	removeObject = function(self, obj, x, y)
 	-- remove obj from (x,y)
-		set = self.obj[x][y]
-		print(set[obj])
+		self.obj[x][y] = nil
 	end,
 	
 	snapObject = function(self, obj)

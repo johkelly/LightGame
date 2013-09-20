@@ -24,12 +24,8 @@ function love.load()
 	GridModule = require("gridspace_module")
 	foo = GridModule.GridContainer(10, 10, 500, 500, 3, 3)
 	foo:putObject(Kuroko, 1, 0)
-	foo:getObjects(0, 1)
+	foo:getObjects(1, 0)
 	foo:removeObject(Kuroko, 1, 0)
-	if (foo:getObjects(0, 1) == nil)
-	then
-		print("YAY")
-	end
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	x = 100
 	y = 100
