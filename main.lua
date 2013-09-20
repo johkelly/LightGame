@@ -31,6 +31,9 @@ function love.load()
 	GridModule = require("gridspace_module")
 	foo = GridModule.GridContainer(10, 10, 500, 500, 3, 3)
 	--foo:putObject(Kuroko, 0, 1)
+	foo:putObject(Kuroko, 1, 0)
+	foo:getObjects(1, 0)
+	foo:removeObject(Kuroko, 1, 0)
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	x = 100
 	y = 100
@@ -72,6 +75,7 @@ end
 
 function love.mousereleased(x, y, button)
 	Kuroko.dragging.grabbed= false
+	foo:snapObject(Kuroko)
 end
 
 function love.keypressed(key, isrepeat)
