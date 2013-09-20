@@ -18,16 +18,21 @@ local GridContainer = {
 		return self.obj[gridx][gridy]
 	end,
 
-	getObjects = function(self, x, y)
-	-- return a collection of objects at (x,y)
+	getObject = function(self, x, y)
+	-- return object at (x,y)
 		return self.obj[x][y]
 	end,
 
-	removeObject = function(self, x, y)
+	removeObjectAt = function(self, x, y)
 	-- remove obj from (x,y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
 		self.obj[gridx][gridy] = nil
+	end,
+		
+	removeObject = function(self, x, y)
+	-- remove any object from (x,y)
+		self.obj[x][y] = nil
 	end,
 	
 	snapObject = function(self, obj)
