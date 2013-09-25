@@ -15,15 +15,15 @@ function love.draw()
 	MouseGrabStack.draw()
 end
 
-function getArea(y)
-	return ((y > board.height) and itembox or board)
+function getGridAt(y)
+	return ((y < itembox.y) and board or itembox)
 end
 
 function love.mousepressed(x, y, button)
-	area = getArea(y)
+	grid = getGridAt(y)
 
-	grabbed = area:pickObject(x, y)
-	area:removeObjectAt(x, y)
+	grabbed = grid:pickObject(x, y)
+	grid:removeObjectAt(x, y)
 
 	MouseGrabStack.grab(grabbed, x, y)
 end
@@ -35,8 +35,8 @@ end
 function love.mousereleased(x, y, button)
 	local released, grabX, grabY = MouseGrabStack.release()
 	if released then
-		area = getArea(y)
-		area:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+		grid = getGridAt(y)
+		grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
 	end
 end
 
