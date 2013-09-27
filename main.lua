@@ -2,13 +2,16 @@ function love.load()
 	love.graphics.setMode(600, 500)
 	GridModule = require("gridspace_module")
 	MouseGrabStack = require("mousegrab_module")
+	LightModule = require("lightbeam_module")
 	foo = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	GO_Kuroko = GridModule.GridObject(kuroko)
 	foo:putObject(GO_Kuroko, 0, 1)
+	lightbeam = LightModule.LightBeam(foo, 3, 2, "right")
 end
 
 function love.draw()
+	lightbeam:shine()
 	foo:draw()
 	MouseGrabStack.draw()
 end
