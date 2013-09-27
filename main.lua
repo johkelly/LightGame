@@ -4,9 +4,11 @@ function love.load()
 	MouseGrabStack = require("mousegrab_module")
 	board = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
 	itembox = GridModule.GridContainer(25, 500, 550, 90, 5, 2)
-	kuroko = love.graphics.newImage("images/kuroko.png")
-	GO_Kuroko = GridModule.GridObject(kuroko)
-	itembox:putObject(GO_Kuroko, 0, 0)
+	for line in love.filesystem.lines("objects.dat") do
+		tempObj = love.graphics.newImage("images/"..line)
+		GO_tempObj = GridModule.GridObject(tempObj)
+		itembox:putObject(GO_tempObj,itembox:getFirstEmptySpace())
+	end	
 end
 
 function love.draw()

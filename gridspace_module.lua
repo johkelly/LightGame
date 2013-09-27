@@ -44,7 +44,7 @@ local GridContainer = {
 		obj.y = self.y + (self.width / self.rows) * near_y
 		self:putObject(obj, near_x, near_y)
 	end,
-	
+
 	snapObjectAt = function(self, obj, x, y)
 		local near_x = (x - self.x) / (self.width / self.rows)
 		local near_y = (y - self.y) / (self.height / self.cols)
@@ -53,6 +53,17 @@ local GridContainer = {
 		obj.x = self.x + (self.width / self.rows) * near_x
 		obj.y = self.y + (self.width / self.rows) * near_y
 		self:putObject(obj, near_x, near_y)
+	end,
+	
+	getFirstEmptySpace = function(self)
+		for i = 0, self.rows, 1 do
+			for j = 0, self.cols, 1 do
+				if self:getObject(j,i) == nil then
+					return j,i
+				end
+			end
+		end
+		return nil
 	end,
 
 	draw = function(self)
