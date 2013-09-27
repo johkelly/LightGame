@@ -95,6 +95,10 @@ local GridContainer = {
 		end
 	-- maybe a border
 	end,
+
+	inGrid = function(self, y)
+		return (y > self.y) and (y < self.height)
+	end,
 }
 
 local GridContainer_mt = {__index = GridContainer}

@@ -18,7 +18,7 @@ function love.draw()
 end
 
 function getGridAt(y)
-	return ((y < itembox.y) and board or itembox)
+	return ((board:inGrid(y)) and board or itembox)
 end
 
 function love.mousepressed(x, y, button)
