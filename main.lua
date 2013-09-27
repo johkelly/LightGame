@@ -24,10 +24,13 @@ end
 function love.mousepressed(x, y, button)
 	grid = getGridAt(y)
 
-	grabbed = grid:pickObject(x, y)
-	grid:removeObjectAt(x, y)
+	if button == "l"
+	then
+		grabbed = grid:pickObject(x, y)
+		grid:removeObjectAt(x, y)
 
-	MouseGrabStack.grab(grabbed, x, y)
+		MouseGrabStack.grab(grabbed, x, y)
+	end
 end
 
 function love.update(dt)
@@ -35,10 +38,14 @@ function love.update(dt)
 end
 
 function love.mousereleased(x, y, button)
-	local released, grabX, grabY = MouseGrabStack.release()
-	if released then
-		grid = getGridAt(y)
-		grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+	grid = getGridAt(y)
+
+	if button == "l"
+	then
+		local released, grabX, grabY = MouseGrabStack.release()
+		if released then
+			grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+		end
 	end
 end
 
