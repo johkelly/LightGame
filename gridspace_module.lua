@@ -35,6 +35,22 @@ local GridContainer = {
 		self.obj[x][y] = nil
 	end,
 	
+	getNearestSpace = function(self,x,y)
+		local near_x = x / (self.width / self.rows)
+		local near_y = y / (self.height / self.cols)
+		near_x = math.min(math.max(math.floor(near_x + .5),0),self.rows - 1)
+		near_y = math.min(math.max(math.floor(near_y + .5),0),self.cols - 1)
+		return near_x,near_y
+	end,
+	
+	getNearestSpace = function(self, x, y)
+		local near_x = (x-self.x) / (self.width / self.rows)
+		local near_y = (y-self.y) / (self.height / self.cols)
+		near_x = math.min(math.max(math.floor(near_x),0),self.rows - 1)
+		near_y = math.min(math.max(math.floor(near_y),0),self.cols - 1)
+		return near_x,near_y
+	end,
+	
 	snapObject = function(self, obj)
 		local near_x = obj.x / (self.width / self.rows)
 		local near_y = obj.y / (self.height / self.cols)
@@ -46,10 +62,7 @@ local GridContainer = {
 	end,
 
 	snapObjectAt = function(self, obj, x, y)
-		local near_x = (x - self.x) / (self.width / self.rows)
-		local near_y = (y - self.y) / (self.height / self.cols)
-		near_x = math.min(math.max(math.floor(near_x),0),self.rows - 1)
-		near_y = math.min(math.max(math.floor(near_y),0),self.cols - 1)
+		local near_x,near_y = grid:getNearestSpace(x,y)
 		obj.x = self.x + (self.width / self.rows) * near_x
 		obj.y = self.y + (self.width / self.rows) * near_y
 		self:putObject(obj, near_x, near_y)

@@ -44,7 +44,11 @@ function love.mousereleased(x, y, button)
 	then
 		local released, grabX, grabY = MouseGrabStack.release()
 		if released then
-			grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+			local tempObj = grid:getObject(grid:getNearestSpace(love.mouse.getX(), love.mouse.getY()))
+			if(tempObj ~= nil) then
+				itembox:putObject(tempObj,itembox:getFirstEmptySpace())
+			end
+			grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY())
 		end
 	end
 end
