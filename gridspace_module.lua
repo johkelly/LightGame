@@ -1,4 +1,5 @@
 local GridSpace = {}
+Stack = require("stack_module")
 
 --[[
 Define a GridContainer to act as the primary layout manager.
@@ -9,7 +10,8 @@ local GridContainer = {
 	-- store obj at (x,y)
 		obj.x = self.x + (self.width / self.rows) * x
 		obj.y = self.y + (self.height / self.cols) * y
-		self.obj[x][y] = obj
+		self.obj[x][y] = Stack:Create()
+		self.obj[x][y].push(obj)
 	end,
 	
 	pickObject = function(self, x, y)
