@@ -9,16 +9,16 @@ local LightBeam = {
 	},
 	reflectDirLookup = {
 		left = {
-			reflect_right = "up",
-			reflect_left = "down"
+			reflect_right = "down",
+			reflect_left = "up"
 		},
 		up = {
 			reflect_right = "right",
 			reflect_left = "left"
 		},
 		right = {
-			reflect_right = "down",
-			reflect_left = "up"
+			reflect_right = "up",
+			reflect_left = "down"
 		},
 		down = {
 			reflect_right = "left",
