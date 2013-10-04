@@ -6,8 +6,9 @@ function love.load()
 	foo = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
 	kuroko = love.graphics.newImage("images/kuroko.png")
 	GO_Kuroko = GridModule.GridObject(kuroko)
+	GO_Kuroko.objType = "reflect_right"
 	foo:putObject(GO_Kuroko, 0, 1)
-	lightbeam = LightModule.LightBeam(foo, 2, 3, "right")
+	lightbeam = LightModule.LightBeam(foo, 0, 3, "up")
 end
 
 function love.draw()

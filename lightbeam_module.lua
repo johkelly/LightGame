@@ -6,6 +6,24 @@ local LightBeam = {
 		up   = {x =  0, y = -1},
 		right= {x =  1, y =  0},
 		down = {x =  0, y =  1}
+	},
+	reflectDirLookup = {
+		left = {
+			reflect_right = "up",
+			reflect_left = "down"
+		},
+		up = {
+			reflect_right = "right",
+			reflect_left = "left"
+		},
+		right = {
+			reflect_right = "down",
+			reflect_left = "up"
+		},
+		down = {
+			reflect_right = "left",
+			reflect_left = "right"
+		}
 	}
 }
 
@@ -21,7 +39,8 @@ function LightBeam.shine(self)
 	-- while light is still cast, get the next change in direction location
 	while emit do
 		-- cast until collide
-		local collision = self:findColl(emit, emitDir)
+		local collision, type = self:findColl(emit, emitDir)
+		-- TODO: Collect extra beams in a table and cast/draw
 		if collision == nil then
 			break
 		end
@@ -29,40 +48,65 @@ function LightBeam.shine(self)
 		self:drawBeam(emit, collision, emitDir)
 		-- change state
 		emit = collision
-		emitDir = "up"
+		--if type == "reflect_right" then emitDir = "right" end
+		emit, emitDir = self:reactToObject(emitDir, collision, type)
 	end
 	love.graphics.setLineWidth(1)
 	love.graphics.setColor(255, 255, 255, 255)
 	-- TODO
 end
 
+function LightBeam.reactToObject(self, approachDir, collision, type)
+	if type:find("reflect") then
+		return collision, self.reflectDirLookup[approachDir][type]
+	elseif type:find("edge") then
+		return nil, type
+	end
+end
+
 function LightBeam.findColl(self, emit, emitDir)
 	-- TODO: Try to collide with objects first
 	local step = self.stepDirLookup[emitDir]
 	local current = {x = emit.x, y = emit.y}
-	if  current.x + step.x >= self.parent.rows
-		or current.x + step.x <= -1
-		or current.y + step.y >= self.parent.cols
-		or current.y + step.y  <= -1
+	if  self:leavingGrid(emit, step)
 	then
 		return nil
 	end
 	-- While the current square is on the grid
-	while   current.x < self.parent.rows
-		and current.x >= 0
-		and current.y < self.parent.cols
-		and current.y >= 0
+	while   self:inGrid(current)
 	do
-		-- Collide with stuff
-		-- Return early
 		-- Update current
-		current.x = current.x + step.x
-		current.y = current.y + step.y
+		self.step(current, step)
+		-- Collide with stuff
+		local object = self.parent:getObject(current.x, current.y)
+		if object and object.objType then
+			-- Return early
+			return current, object.objType
+		end
 	end
 	-- step back one because we left the grid
 	current.x = current.x - step.x
 	current.y = current.y - step.y
-	return current
+	return current, "edge"
+end
+
+function LightBeam.leavingGrid(self, current, step)
+	return current.x + step.x >= self.parent.rows
+		or current.x + step.x <= -1
+		or current.y + step.y >= self.parent.cols
+		or current.y + step.y  <= -1
+end
+
+function LightBeam.inGrid(self, current)
+	return current.x < self.parent.rows
+		and current.x >= 0
+		and current.y < self.parent.cols
+		and current.y >= 0
+end
+
+function LightBeam.step(current, step)
+		current.x = current.x + step.x
+		current.y = current.y + step.y
 end
 
 function LightBeam.drawBeam(self, emit, collision, dir)
@@ -70,10 +114,10 @@ function LightBeam.drawBeam(self, emit, collision, dir)
 	local origin = {x = self.parent.x, y = self.parent.y}
 	local cellDim = self.parent.width / self.parent.rows
 	-- calculate centers of "lit" squares
-	local start = {x = origin.x + cellDim * (emit.x + .5), y = origin.y + cellDim * (emit.y + .5)}
 	local finish = {x = origin.x + cellDim * (collision.x + .5), y = origin.y + cellDim * (collision.y + .5)}
+	self.step(origin, {x = cellDim * (emit.x + .5), y = cellDim * (emit.y + .5)})
 	-- draw
-	love.graphics.line(start.x, start.y, finish.x, finish.y)
+	love.graphics.line(origin.x, origin.y, finish.x, finish.y)
 end
 
 function LightBeam.ctor(self, parentGrid, startXCoord, startYCoord, direction)
