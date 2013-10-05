@@ -12,7 +12,7 @@ local GridContainer = {
 		obj.x = self.x + (self.width / self.rows) * x
 		obj.y = self.y + (self.height / self.cols) * y
 		
-		Stack.push(self.obj[x][y], obj)
+		self.obj[x][y]:push(obj)
 	end,
 	
 	pickObject = function(self, x, y)
@@ -23,25 +23,26 @@ local GridContainer = {
 		then 
 			return nil
 		end
+		--love.graphics.print("lol",100aitembox:getFirstEmptySpace())aaaa
 
-		return Stack.top(self.obj[gridx][gridy])
+		return self.obj[gridx][gridy]:top()
 	end,
 
 	getObject = function(self, x, y)
-	-- return object at (x,y)
-		return Stack.top(self.obj[x][y])
+		return self.obj[x][y]:top()
 	end,
 
 	removeObjectAt = function(self, x, y)
 	-- remove obj from (x,y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
-		Stack.pop(self.obj[gridx][gridy])
+
+		self.obj[gridx][gridy]:pop()
 	end,
 		
 	removeObject = function(self, x, y)
 	-- remove any object from (x,y)
-		Stack.pop(self.obj[x][y])
+		self.obj[x][y]:pop()
 	end,
 	
 	snapObject = function(self, obj)
@@ -92,13 +93,22 @@ local GridContainer = {
 
 		for x = 0, self.rows, 1 do
 			for y = 0, self.cols, 1 do
-				local obj = Stack.top(self.obj[x][y])
+				local obj = self.obj[x][y]:top()
 				if(obj)
 				then
 					-- TODO: for each in objs
 					local l, t = self.x + x * cWidth, self.y + y * cHeight
 					local r, b = l + cWidth, t + cHeight
+
 					obj:drawFill(l, t, r, b)
+
+					local num_objs = self.obj[x][y]:size()
+
+					-- TODO: nicer print, arbitrary padding of 5 for now
+					if (num_objs > 1) then
+						love.graphics.print(self.obj[x][y]:size(), l+5, t+5)
+					end
+
 				end
 			end
 		end
@@ -121,7 +131,7 @@ GridContainer.ctor = function(self, l, t, w, h, r, c)
 		
 		-- fill with stack
 		for ly = 0, c, 1 do
-			t.obj[lx][ly] = Stack.new()
+			t.obj[lx][ly] = Stack()
 		end
 	end
 
