@@ -6,8 +6,12 @@ function love.load()
 	itembox = GridModule.GridContainer(25, 500, 550, 90, 5, 2)
 	for line in love.filesystem.lines("objects.dat") do
 		tempObj = love.graphics.newImage("images/"..line)
-		GO_tempObj = GridModule.GridObject(tempObj)
-		itembox:putObject(GO_tempObj,itembox:getFirstEmptySpace())
+
+		local x, y = itembox:getFirstEmptySpace()
+
+		for i = 0, 2 do
+			itembox:putObject(GridModule.GridObject(tempObj), x, y)
+		end
 	end	
 end
 
@@ -24,12 +28,17 @@ end
 function love.mousepressed(x, y, button)
 	grid = getGridAt(y)
 
-	if button == "l"
+	if (button == "l")
 	then
 		grabbed = grid:pickObject(x, y)
-		grid:removeObjectAt(x, y)
+
+		if grabbed == nil
+		then 
+			return
+		end
 
 		MouseGrabStack.grab(grabbed, x, y)
+		grid:removeObjectAt(x, y)
 	end
 end
 
