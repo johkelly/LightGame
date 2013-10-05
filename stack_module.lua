@@ -1,22 +1,61 @@
 local Stack = {}
 
-function Stack.Create()
-	local t = {}
-	t._et = {}
+function Stack.new()
+	 return {first = 0}
+end
 
-	function t.push(...)
-		if ...
-		then
-			local targs = {...}
-			for _,v in pairs(targs) do
-				table.insert(t._et, v)
-			end
-		end
-	end 
+function Stack.push(stack, value)
+	if (stack == nil) then 
+		return nil 
+	end
 
-	return t
+	-- find new top of stack
+	local first = stack.first + 1
+	stack.first = first
+	
+	-- set top of stack to value
+	stack[first] = value
+end
 
+function Stack.pop(stack)
+	if (stack == nil) then 
+		return nil 
+	end
+
+	-- find top of stack
+	local first = stack.first
+	local value = stack[first]
+
+	-- remove top of stack
+	stack[first] = nil
+	stack.first = first - 1
+
+	return value
+end
+
+function Stack.top(stack)
+	if (stack == nil) then 
+		return nil 
+	end
+
+	-- return top of stack
+	return stack[stack.first]
+end
+
+-- get object at index
+function Stack.objAt(stack, index)
+	if (stack == nil or index == nil) then 
+		return nil 
+	end
+	return stack[index]
+end
+
+-- get size of stack
+function Stack.size(stack)
+	if (stack == nil) then 
+		return nil 
+	end
+	return stack.first
 end
 
 return Stack
-	

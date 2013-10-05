@@ -26,11 +26,15 @@ function love.mousepressed(x, y, button)
 
 	if button == "l"
 	then
-
 		grabbed = grid:pickObject(x, y)
-		grid:removeObjectAt(x, y)
+
+		if grabbed == nil
+		then 
+			return
+		end
 
 		MouseGrabStack.grab(grabbed, x, y)
+		grid:removeObjectAt(x, y)
 	end
 end
 

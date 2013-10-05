@@ -1,40 +1,47 @@
 local GridSpace = {}
-Stack = require("stack_module")
+local Stack = require("stack_module")
 
 --[[
 Define a GridContainer to act as the primary layout manager.
 ]]--
 
 local GridContainer = {
+
 	putObject = function(self, obj, x, y)
 	-- store obj at (x,y)
 		obj.x = self.x + (self.width / self.rows) * x
 		obj.y = self.y + (self.height / self.cols) * y
-		self.obj[x][y] = Stack:Create()
-		self.obj[x][y].push(obj)
+		
+		Stack.push(self.obj[x][y], obj)
 	end,
 	
 	pickObject = function(self, x, y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
-		return self.obj[gridx][gridy]
+
+		if gridx < 0 or gridy < 0
+		then 
+			return nil
+		end
+
+		return Stack.top(self.obj[gridx][gridy])
 	end,
 
 	getObject = function(self, x, y)
 	-- return object at (x,y)
-		return self.obj[x][y]
+		return Stack.top(self.obj[x][y])
 	end,
 
 	removeObjectAt = function(self, x, y)
 	-- remove obj from (x,y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
-		self.obj[gridx][gridy] = nil
+		Stack.pop(self.obj[gridx][gridy])
 	end,
 		
 	removeObject = function(self, x, y)
 	-- remove any object from (x,y)
-		self.obj[x][y] = nil
+		Stack.pop(self.obj[x][y])
 	end,
 	
 	snapObject = function(self, obj)
@@ -85,7 +92,7 @@ local GridContainer = {
 
 		for x = 0, self.rows, 1 do
 			for y = 0, self.cols, 1 do
-				local obj = self.obj[x][y]
+				local obj = Stack.top(self.obj[x][y])
 				if(obj)
 				then
 					-- TODO: for each in objs
@@ -111,7 +118,13 @@ GridContainer.ctor = function(self, l, t, w, h, r, c)
 	t.obj = {}
 	for lx = 0, r, 1 do
 		t.obj[lx] = {}
+		
+		-- fill with stack
+		for ly = 0, c, 1 do
+			t.obj[lx][ly] = Stack.new()
+		end
 	end
+
 	setmetatable(t, GridContainer_mt)
 	return t
 end
