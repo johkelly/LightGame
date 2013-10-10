@@ -1,38 +1,63 @@
 local GridSpace = {}
+local Stack = require("stack_module")
 
 --[[
 Define a GridContainer to act as the primary layout manager.
 ]]--
 
 local GridContainer = {
+
 	putObject = function(self, obj, x, y)
 	-- store obj at (x,y)
 		obj.x = self.x + (self.width / self.rows) * x
 		obj.y = self.y + (self.height / self.cols) * y
-		self.obj[x][y] = obj
+		
+		self.obj[x][y]:push(obj)
 	end,
 	
 	pickObject = function(self, x, y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
-		return self.obj[gridx][gridy]
+
+		if gridx < 0 or gridy < 0
+		then 
+			return nil
+		end
+
+		return self.obj[gridx][gridy]:top()
 	end,
 
 	getObject = function(self, x, y)
-	-- return object at (x,y)
-		return self.obj[x][y]
+		return self.obj[x][y]:top()
 	end,
 
 	removeObjectAt = function(self, x, y)
 	-- remove obj from (x,y)
 		local gridx = math.floor(self.rows*(x-self.x)/self.width)
 		local gridy = math.floor(self.cols*(y-self.y)/self.height)
-		self.obj[gridx][gridy] = nil
+
+		self.obj[gridx][gridy]:pop()
 	end,
 		
 	removeObject = function(self, x, y)
 	-- remove any object from (x,y)
-		self.obj[x][y] = nil
+		self.obj[x][y]:pop()
+	end,
+	
+	getNearestSpace = function(self,x,y)
+		local near_x = x / (self.width / self.rows)
+		local near_y = y / (self.height / self.cols)
+		near_x = math.min(math.max(math.floor(near_x + .5),0),self.rows - 1)
+		near_y = math.min(math.max(math.floor(near_y + .5),0),self.cols - 1)
+		return near_x,near_y
+	end,
+	
+	getNearestSpace = function(self, x, y)
+		local near_x = (x-self.x) / (self.width / self.rows)
+		local near_y = (y-self.y) / (self.height / self.cols)
+		near_x = math.min(math.max(math.floor(near_x),0),self.rows - 1)
+		near_y = math.min(math.max(math.floor(near_y),0),self.cols - 1)
+		return near_x,near_y
 	end,
 	
 	snapObject = function(self, obj)
@@ -44,15 +69,23 @@ local GridContainer = {
 		obj.y = self.y + (self.width / self.rows) * near_y
 		self:putObject(obj, near_x, near_y)
 	end,
-	
+
 	snapObjectAt = function(self, obj, x, y)
-		local near_x = (x - self.x) / (self.width / self.rows)
-		local near_y = (y - self.y) / (self.height / self.cols)
-		near_x = math.min(math.max(math.floor(near_x),0),self.rows - 1)
-		near_y = math.min(math.max(math.floor(near_y),0),self.cols - 1)
+		local near_x,near_y = grid:getNearestSpace(x,y)
 		obj.x = self.x + (self.width / self.rows) * near_x
 		obj.y = self.y + (self.width / self.rows) * near_y
 		self:putObject(obj, near_x, near_y)
+	end,
+	
+	getFirstEmptySpace = function(self)
+		for i = 0, self.rows, 1 do
+			for j = 0, self.cols, 1 do
+				if self:getObject(j,i) == nil then
+					return j,i
+				end
+			end
+		end
+		return nil
 	end,
 
 	draw = function(self)
@@ -72,17 +105,30 @@ local GridContainer = {
 
 		for x = 0, self.rows, 1 do
 			for y = 0, self.cols, 1 do
-				local obj = self.obj[x][y]
+				local obj = self.obj[x][y]:top()
 				if(obj)
 				then
 					-- TODO: for each in objs
 					local l, t = self.x + x * cWidth, self.y + y * cHeight
 					local r, b = l + cWidth, t + cHeight
+
 					obj:drawFill(l, t, r, b)
+
+					local num_objs = self.obj[x][y]:size()
+
+					-- TODO: nicer print, arbitrary padding of 5 for now
+					if (num_objs > 1) then
+						love.graphics.print(num_objs, l+5, t+5)
+					end
+
 				end
 			end
 		end
 	-- maybe a border
+	end,
+
+	inGrid = function(self, y)
+		return (y > self.y) and (y < self.height)
 	end,
 }
 
@@ -94,7 +140,13 @@ GridContainer.ctor = function(self, l, t, w, h, r, c)
 	t.obj = {}
 	for lx = 0, r, 1 do
 		t.obj[lx] = {}
+		
+		-- fill with stack
+		for ly = 0, c, 1 do
+			t.obj[lx][ly] = Stack()
+		end
 	end
+
 	setmetatable(t, GridContainer_mt)
 	return t
 end

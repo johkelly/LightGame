@@ -1,26 +1,45 @@
 function love.load()
-	love.graphics.setMode(600, 500)
+	love.graphics.setMode(600, 600)
 	GridModule = require("gridspace_module")
 	MouseGrabStack = require("mousegrab_module")
-	LightModule = require("lightbeam_module")
-	foo = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
-	kuroko = love.graphics.newImage("images/kuroko.png")
-	GO_Kuroko = GridModule.GridObject(kuroko)
-	GO_Kuroko.objType = "reflect_right"
-	foo:putObject(GO_Kuroko, 0, 1)
-	lightbeam = LightModule.LightBeam(foo, 0, 3, "up")
+	board = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
+	itembox = GridModule.GridContainer(25, 500, 550, 90, 5, 2)
+	for line in love.filesystem.lines("objects.dat") do
+		tempObj = love.graphics.newImage("images/"..line)
+
+		local x, y = itembox:getFirstEmptySpace()
+
+		for i = 0, 2 do
+			itembox:putObject(GridModule.GridObject(tempObj), x, y)
+		end
+	end	
 end
 
 function love.draw()
-	lightbeam:shine()
-	foo:draw()
+	board:draw()
+	itembox:draw()
 	MouseGrabStack.draw()
 end
 
+function getGridAt(y)
+	return ((board:inGrid(y)) and board or itembox)
+end
+
 function love.mousepressed(x, y, button)
-	grabbed = foo:pickObject(x, y)
-	foo:removeObjectAt(x, y)
-	MouseGrabStack.grab(grabbed, x, y)
+	grid = getGridAt(y)
+
+	if (button == "l")
+	then
+		grabbed = grid:pickObject(x, y)
+
+		if grabbed == nil
+		then 
+			return
+		end
+
+		MouseGrabStack.grab(grabbed, x, y)
+		grid:removeObjectAt(x, y)
+	end
 end
 
 function love.update(dt)
@@ -28,9 +47,18 @@ function love.update(dt)
 end
 
 function love.mousereleased(x, y, button)
-	local released, grabX, grabY = MouseGrabStack.release()
-	if released then
-		foo:snapObjectAt(released, love.mouse.getX(), love.mouse.getY()) 
+	grid = getGridAt(y)
+
+	if button == "l"
+	then
+		local released, grabX, grabY = MouseGrabStack.release()
+		if released then
+--			local tempObj = grid:getObject(grid:getNearestSpace(love.mouse.getX(), love.mouse.getY()))
+--			if(tempObj ~= nil) then
+--				itembox:putObject(tempObj,itembox:getFirstEmptySpace())
+--			end
+			grid:snapObjectAt(released, love.mouse.getX(), love.mouse.getY())
+		end
 	end
 end
 
