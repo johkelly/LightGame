@@ -23,7 +23,6 @@ local GridContainer = {
 		then 
 			return nil
 		end
-		--love.graphics.print("lol",100aitembox:getFirstEmptySpace())aaaa
 
 		return self.obj[gridx][gridy]:top()
 	end,
@@ -119,7 +118,7 @@ local GridContainer = {
 
 					-- TODO: nicer print, arbitrary padding of 5 for now
 					if (num_objs > 1) then
-						love.graphics.print(self.obj[x][y]:size(), l+5, t+5)
+						love.graphics.print(num_objs, l+5, t+5)
 					end
 
 				end
