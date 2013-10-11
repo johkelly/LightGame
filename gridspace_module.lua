@@ -28,6 +28,9 @@ local GridContainer = {
 	end,
 
 	getObject = function(self, x, y)
+		if x < 0 or x >= self.rows or y < 0 or y >= self.cols then
+			return nil
+		end
 		return self.obj[x][y]:top()
 	end,
 

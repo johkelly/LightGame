@@ -2,15 +2,23 @@ function love.load()
 	love.graphics.setMode(600, 600)
 	GridModule = require("gridspace_module")
 	MouseGrabStack = require("mousegrab_module")
+	LightModule = require("lightbeam_module")
 	board = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
 	itembox = GridModule.GridContainer(25, 500, 550, 90, 5, 2)
+	light = LightModule.LightBeam(board, 0, 2, "right")
 	for line in love.filesystem.lines("objects.dat") do
-		tempObj = love.graphics.newImage("images/"..line)
+		local graphic = love.graphics.newImage("images/"..line)
 
 		local x, y = itembox:getFirstEmptySpace()
 
 		for i = 0, 2 do
-			itembox:putObject(GridModule.GridObject(tempObj), x, y)
+			local tempObj = GridModule.GridObject(graphic)
+			-- Need a more formal way to definet his
+			tempObj.react = function(self, collision, approachDir)
+				local ref = {up = "right", right = "down", down = "left", left = "up"}
+				return collision, ref[approachDir]
+			end
+			itembox:putObject(tempObj, x, y)
 		end
 	end	
 end
@@ -19,6 +27,7 @@ function love.draw()
 	board:draw()
 	itembox:draw()
 	MouseGrabStack.draw()
+	light:shine()
 end
 
 function getGridAt(y)

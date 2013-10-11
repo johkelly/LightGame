@@ -39,7 +39,7 @@ function LightBeam.shine(self)
 	-- while light is still cast, get the next change in direction location
 	while emit do
 		-- cast until collide
-		local collision, type = self:findColl(emit, emitDir)
+		local collision, object = self:findColl(emit, emitDir)
 		-- TODO: Collect extra beams in a table and cast/draw
 		if collision == nil then
 			break
@@ -49,19 +49,18 @@ function LightBeam.shine(self)
 		-- change state
 		emit = collision
 		--if type == "reflect_right" then emitDir = "right" end
-		emit, emitDir = self:reactToObject(emitDir, collision, type)
+		emit, emitDir = self:reactToObject(collision, emitDir, object)
 	end
 	love.graphics.setLineWidth(1)
 	love.graphics.setColor(255, 255, 255, 255)
 	-- TODO
 end
 
-function LightBeam.reactToObject(self, approachDir, collision, type)
-	if type:find("reflect") then
-		return collision, self.reflectDirLookup[approachDir][type]
-	elseif type:find("edge") then
-		return nil, type
+function LightBeam.reactToObject(self, collision, approachDir, object)
+	if not object then
+		return nil, "edge"
 	end
+	return object:react(collision, approachDir)
 end
 
 function LightBeam.findColl(self, emit, emitDir)
@@ -79,15 +78,15 @@ function LightBeam.findColl(self, emit, emitDir)
 		self.step(current, step)
 		-- Collide with stuff
 		local object = self.parent:getObject(current.x, current.y)
-		if object and object.objType then
+		if object then
 			-- Return early
-			return current, object.objType
+			return current, object
 		end
 	end
 	-- step back one because we left the grid
 	current.x = current.x - step.x
 	current.y = current.y - step.y
-	return current, "edge"
+	return current, nil
 end
 
 function LightBeam.leavingGrid(self, current, step)
