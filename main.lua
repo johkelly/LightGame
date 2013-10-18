@@ -3,7 +3,7 @@ require "yaml"
 function love.load()
 	config = load_yaml("config.yml")
 
-	love.graphics.setMode(600, 600)
+	love.graphics.setMode(config.window.width, config.window.height)
 	GridModule = require("gridspace_module")
 	MouseGrabStack = require("mousegrab_module")
 	board = GridModule.GridContainer(25, 30, 550, 440, 5, 4)
