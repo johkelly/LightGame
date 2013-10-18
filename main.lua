@@ -1,4 +1,8 @@
+require "yaml"
+
 function love.load()
+	config = load_yaml("config.yml")
+
 	love.graphics.setMode(600, 600)
 	GridModule = require("gridspace_module")
 	MouseGrabStack = require("mousegrab_module")
@@ -13,6 +17,16 @@ function love.load()
 			itembox:putObject(GridModule.GridObject(tempObj), x, y)
 		end
 	end	
+end
+
+function load_yaml(filepath)
+	-- yaml has a load_file method
+	local f, err = io.open(filepath, "r")
+	if not f then return nil, err end
+	local config = yaml.load(f:read("*all"))
+	f:close()
+
+	return config
 end
 
 function love.draw()
